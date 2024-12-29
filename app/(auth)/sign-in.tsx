@@ -15,7 +15,7 @@ import { useState } from "react";
 import { LoginFormProps } from "@/types/types";
 import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
-import { signIn, signOut } from "@/lib/appwrite";
+import { signIn } from "@/lib/appwrite";
 
 const SignIn = () => {
   const [form, setForm] = useState<LoginFormProps>({

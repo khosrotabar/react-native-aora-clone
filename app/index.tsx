@@ -1,12 +1,26 @@
-import { Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/constants";
 import React from "react";
 import CustomButton from "@/components/CustomButton";
-import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function App() {
+  const context = useGlobalContext();
+
+  if (!context?.isLoading && context?.isLoggedIn) {
+    return <Redirect href="/home" />;
+  }
+
+  if (context?.isLoading) {
+    return (
+      <SafeAreaView className="bg-primary h-full justify-center items-center">
+        <ActivityIndicator size={40} color="#FFFFFF" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
