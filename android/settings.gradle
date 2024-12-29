@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'aoraclone'
+rootProject.name = 'aora-clone'
 
 dependencyResolutionManagement {
   versionCatalogs {
