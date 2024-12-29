@@ -1,39 +1,20 @@
 import {
   View,
-  Text,
   FlatList,
   TouchableOpacity,
   ImageBackground,
   Image,
   ViewToken,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Models } from "react-native-appwrite";
-import * as Aniatable from "react-native-animatable";
 import { icons } from "@/constants";
 import Video, { VideoRef } from "react-native-video";
-
-const zoomIn = {
-  0: {
-    scaleX: 0.9,
-    scaleY: 0.9,
-  },
-  1: {
-    scaleX: 1.1,
-    scaleY: 1.1,
-  },
-};
-
-const zoomOut = {
-  0: {
-    scaleX: 1.1,
-    scaleY: 1.1,
-  },
-  1: {
-    scaleX: 0.9,
-    scaleY: 0.9,
-  },
-};
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 const TrndingItem = ({
   activeItem,
@@ -45,12 +26,28 @@ const TrndingItem = ({
   const [play, setPlay] = useState<boolean>(false);
   const videoRef = useRef<VideoRef>(null);
 
+  // Shared value for scaling
+  const scale = useSharedValue(activeItem.$id === item.$id ? 1.1 : 0.95);
+  const marginHorizontal = useSharedValue(activeItem.$id === item.$id ? 18 : 4);
+
+  // Update scale when `activeItem` changes
+  useEffect(() => {
+    scale.value = withTiming(activeItem.$id === item.$id ? 1.1 : 0.95, {
+      duration: 400,
+    });
+    marginHorizontal.value = withTiming(activeItem.$id === item.$id ? 18 : 4, {
+      duration: 400,
+    });
+  }, [activeItem.$id, item.$id]);
+
+  // Animated style for scaling
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    marginHorizontal: marginHorizontal.value,
+  }));
+
   return (
-    <Aniatable.View
-      className="mr-5"
-      animation={activeItem.$id === item.$id ? zoomIn : zoomOut}
-      duration={500}
-    >
+    <Animated.View style={[animatedStyle]}>
       {play ? (
         <Video
           source={{
@@ -76,7 +73,7 @@ const TrndingItem = ({
           <Image source={icons.play} className="w-12 h-12 absolute" />
         </TouchableOpacity>
       )}
-    </Aniatable.View>
+    </Animated.View>
   );
 };
 
@@ -106,7 +103,6 @@ const Trending = ({ posts }: { posts: Models.Document[] }) => {
       }}
       contentOffset={{ x: 170, y: 0 }}
       horizontal
-      className="pl-3"
     />
   );
 };
