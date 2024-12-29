@@ -1,4 +1,4 @@
-package com.aoraclone
+package com.jsm.aora
 
 import android.os.Build
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.aoraclone
+package com.jsm.aora
 
 import android.app.Application
 import android.content.res.Configuration
