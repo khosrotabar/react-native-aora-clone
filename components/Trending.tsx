@@ -1,20 +1,31 @@
 import {
-  View,
   FlatList,
   TouchableOpacity,
   ImageBackground,
   Image,
   ViewToken,
+  StyleSheet,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Models } from "react-native-appwrite";
 import { icons } from "@/constants";
-import Video, { VideoRef } from "react-native-video";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useEvent } from "expo";
+
+const styles = StyleSheet.create({
+  video: {
+    width: 182,
+    height: 258,
+    borderRadius: 35,
+    marginTop: 12,
+    backgroundColor: "#FFFFFF1A",
+  },
+});
 
 const TrndingItem = ({
   activeItem,
@@ -24,7 +35,29 @@ const TrndingItem = ({
   item: Models.Document;
 }) => {
   const [play, setPlay] = useState<boolean>(false);
-  const videoRef = useRef<VideoRef>(null);
+
+  // video player configs
+  const videoSource = item.video;
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.loop = false;
+    player.showNowPlayingNotification = true;
+  });
+
+  const { status } = useEvent(player, "statusChange", {
+    status: player.status,
+  });
+
+  useEffect(() => {
+    if (status === "idle") {
+      setPlay(false);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (play === true) {
+      player.play();
+    }
+  }, [play]);
 
   // Shared value for scaling
   const scale = useSharedValue(activeItem.$id === item.$id ? 1.1 : 0.95);
@@ -49,14 +82,12 @@ const TrndingItem = ({
   return (
     <Animated.View style={[animatedStyle]}>
       {play ? (
-        <Video
-          source={{
-            uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          }}
-          ref={videoRef}
-          className="w-52 h-72 roundde-[35px] mt-3 bg-white/10"
-          resizeMode="contain"
-          showNotificationControls={false}
+        <VideoView
+          player={player}
+          style={styles.video}
+          allowsFullscreen
+          allowsPictureInPicture
+          nativeControls
         />
       ) : (
         <TouchableOpacity
@@ -78,7 +109,7 @@ const TrndingItem = ({
 };
 
 const Trending = ({ posts }: { posts: Models.Document[] }) => {
-  const [activeItem, setActiveItem] = useState<Models.Document>(posts[0]);
+  const [activeItem, setActiveItem] = useState<Models.Document>(posts[1]);
 
   const onViewableItemsChanged = ({
     viewableItems,

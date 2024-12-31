@@ -15,7 +15,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-small.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#161622"
       },
       "package": "com.jsm.aora"
     },

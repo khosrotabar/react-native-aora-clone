@@ -3,10 +3,7 @@ import {
   Text,
   FlatList,
   Image,
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
   RefreshControl,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,9 +15,11 @@ import EmptyState from "@/components/EmptyState";
 import { getAllPosts, getLatestVideos } from "@/lib/appwrite";
 import useAppWritter from "@/hooks/useAppWrite";
 import VideoCard from "@/components/VideoCard";
+import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Home = () => {
-  const [searchVal, setSearchVal] = useState<string>("");
+  const context = useGlobalContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const {
     data: posts,
@@ -58,7 +57,7 @@ const Home = () => {
                   Welcome Back
                 </Text>
                 <Text className="text-2xl font-psemibold text-white">
-                  JSMastery
+                  {context?.user?.username}
                 </Text>
               </View>
               <View className="mt-1.5">
@@ -70,7 +69,7 @@ const Home = () => {
               </View>
             </View>
 
-            <SearchInput value={searchVal} handleChange={setSearchVal} />
+            <SearchInput />
 
             <View className="w-full flex-1 pt-5 pb-8">
               <Text
@@ -85,8 +84,12 @@ const Home = () => {
         )}
         ListEmptyComponent={() => (
           <EmptyState
+            btnText="Create Video"
             title="No Videos Found"
             subtitle="Be the first one to upload a video"
+            handlePress={() => {
+              router.push("/create");
+            }}
           />
         )}
         refreshControl={
